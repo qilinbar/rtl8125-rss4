@@ -4,8 +4,9 @@ PKG_NAME:=r8125-4
 PKG_VERSION:=9.016.01
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
+PKG_SOURCE:=r8125-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=https://github.com/openwrt/rtl8125/releases/download/$(PKG_VERSION)
+PKG_BUILD_DIR:=$(BUILD_DIR)/r8125-$(PKG_VERSION)
 PKG_HASH:=5434b26500538a62541c55cd09eea099177f59bd9cc48d16969089a9bcdbbd41
 
 PKG_BUILD_PARALLEL:=1
@@ -28,7 +29,7 @@ endef
 define KernelPackage/r8125-rss4
 $(call KernelPackage/r8125-4)
   CONFLICTS:=kmod-r8125-4
-  TITLE+= (RSS-4-patched)
+  TITLE:=Realtek RTL8125 PCI 2.5G RSS Driver rx4(Patched-4)
   VARIANT:=rss
 endef
 
