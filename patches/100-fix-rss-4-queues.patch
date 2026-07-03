@@ -1,54 +1,10 @@
---- a/src/r8125.h.orig	2026-06-17 23:56:03.927250281 +0000
-+++ b/src/r8125.h	2026-06-17 23:56:03.954251260 +0000
-@@ -718,11 +718,11 @@
- #define RT_VALN_HLEN 4      /* 4(single vlan) bytes */
- #endif
- 
--#define R8125_MAX_TX_QUEUES (2)
-+#define R8125_MAX_TX_QUEUES (4)
- #define R8125_MAX_RX_QUEUES_V2 (4)
- #define R8125_MAX_RX_QUEUES_V3 (16)
- #define R8125_MAX_RX_QUEUES R8125_MAX_RX_QUEUES_V3
--#define R8125_MAX_QUEUES R8125_MAX_RX_QUEUES
-+#define R8125_MAX_QUEUES (4)
- 
- #define OCP_STD_PHY_BASE	0xa400
- 
---- a/src/r8125_n.c.orig	2026-06-17 23:56:03.932250463 +0000
-+++ b/src/r8125_n.c	2026-06-17 23:56:04.041254415 +0000
-@@ -15171,7 +15171,7 @@
-         tp->num_tx_rings = 1;
- #ifdef ENABLE_MULTIPLE_TX_QUEUE
- #ifndef ENABLE_LIB_SUPPORT
--        tp->num_tx_rings = tp->HwSuppNumTxQueues;
-+        tp->num_tx_rings = 2;
- #endif
- #endif
-         if (tp->HwCurrIsrVer < 2 ||
-@@ -15201,9 +15201,9 @@
-                 tp->EnableRss = 1;
+--- a/src/r8125_n.c
++++ b/src/r8125_n.c
+@@ -15190,7 +15190,6 @@
  #else
          if (tp->HwSuppRssVer > 0 && tp->HwCurrIsrVer > 1) {
--                u8 rss_queue_num = netif_get_num_default_rss_queues();
--                tp->num_rx_rings = (tp->HwSuppNumRxQueues > rss_queue_num)?
--                                   rss_queue_num : tp->HwSuppNumRxQueues;
-+                
-+                tp->num_rx_rings = 4;
-+                        
- 
+-                u16 rss_queue_num = netif_get_num_default_rss_queues();
+-                tp->num_rx_rings = min(tp->HwSuppNumRxQueues, rss_queue_num);
++                tp->num_rx_rings = min(tp->HwSuppNumRxQueues, (u16)4);
                  if (!(tp->num_rx_rings >= 2 && tp->irq_nvecs >= tp->num_rx_rings))
                          tp->num_rx_rings = 1;
-@@ -17407,11 +17407,11 @@
- {
-         int retval = 0;
- 
--        retval = netif_set_real_num_tx_queues(tp->dev, tp->num_tx_rings);
-+        retval = netif_set_real_num_tx_queues(tp->dev, 2);
-         if (retval < 0)
-                 goto exit;
- 
--        retval = netif_set_real_num_rx_queues(tp->dev, tp->num_rx_rings);
-+        retval = netif_set_real_num_rx_queues(tp->dev, 4);
-         if (retval < 0)
-                 goto exit;
- 
